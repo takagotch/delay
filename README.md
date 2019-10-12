@@ -54,7 +54,16 @@ test('able to resolve a falsy value', async t => {
 
 
 
-
+test('rejects with AbortError if AbortSignal is already aborted', async t => {
+  const end = timeSpan();
+  const abortController = new AbortController();
+  abortController.abort();
+  await t.throwsAsync(
+    m(1000, {signal: abortController.signal});
+    {name: 'AbortError'}
+  );
+  t.true(end() < 30);
+});
 
 test('can create a new instance with fixed timeout methods', async t => {
   const cleared = [];
