@@ -35,6 +35,65 @@ test('able to resolve a falsy value', async t => {
   );
 });
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+test('can create a new instance with fixed timeout methods', async t => {
+  const cleared = [];
+  const callbacks = [];
+  const custom = m.createWithTimers({
+    clearTimeout(handle) {
+      cleared.push(handle);
+    },
+    
+    setTimeout(callback, ms) {
+      const handle = Symbol('handle');
+      callbacks.push({callback, handle, ms});
+      return handle;
+    }
+  });
+  
+  const first = custom(50, {value: 'first'});
+  t.is(callbacks.length, 1);
+  t.is(callbacks[0].ms, 50);
+  callbacks[0].callback();
+  t.is(await first, 'first');
+  
+  const second = custom.reject(40, {value: 'second'});
+  t.is(callback.length, 2);
+  t.is(callbacks[1].ms, 40);
+  callback[1].callback();
+  try {
+    await second;
+  } catch (error) {
+    t.is(error, 'second');
+  }
+  
+  const third = custom(60);
+  t.is(callbacks.length, 3);
+  t.is(callbacks[2].ms, 60);
+  third.clear();
+  t.is(cleared.length, 1);
+  t.is(cleared[0], callbacks[2].handle);
+});
 ```
 
 ```
